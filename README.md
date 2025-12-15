@@ -1,36 +1,172 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FakeStore Manager
 
-## Getting Started
+Sistema de gestión de productos desarrollado con Next.js y React para consumir el API Gateway de FakeStore.
 
-First, run the development server:
+## 🚀 Características
+
+- **Lista de productos**: Visualización en tabla con opciones de edición y eliminación
+- **Crear producto**: Formulario para agregar nuevos productos
+- **Editar producto**: Formulario para modificar productos existentes
+- **Validación**: Validación en cliente y manejo de errores del backend
+- **TypeScript**: Tipado fuerte para mejor desarrollo
+- **Tailwind CSS**: Estilos modernos y responsivos
+
+## 🛠️ Tecnologías
+
+- **Next.js 16** - Framework de React
+- **React 19** - Librería UI
+- **TypeScript** - Tipado estático
+- **Tailwind CSS** - Framework de estilos
+- **ESLint** - Linter de código
+
+## 📋 Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── page.tsx              # Página principal
+│   ├── products/
+│   │   ├── page.tsx          # Lista de productos
+│   │   ├── new/
+│   │   │   └── page.tsx      # Crear producto
+│   │   └── [id]/
+│   │       └── page.tsx      # Editar producto
+├── services/
+│   └── products.service.ts   # Cliente API para productos
+└── types/
+    └── api.ts                # Tipos TypeScript de la API
+```
+
+## ⚙️ Configuración
+
+1. Clonar el repositorio
+2. Instalar dependencias:
+   ```bash
+   npm install
+   ```
+
+3. Configurar la variable de entorno del API. Crear archivo `.env.local`:
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   ```
+
+## 🚀 Ejecutar en Desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 Build para Producción
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 🔌 API Backend
 
-To learn more about Next.js, take a look at the following resources:
+El frontend consume el siguiente API Gateway:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Endpoints
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `GET /api/products` - Obtener todos los productos
+- `GET /api/products/{id}` - Obtener producto por ID
+- `POST /api/products` - Crear nuevo producto
+- `PUT /api/products/{id}` - Actualizar producto
+- `DELETE /api/products/{id}` - Eliminar producto
 
-## Deploy on Vercel
+### Estructura de Respuesta
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```typescript
+{
+  isSuccess: boolean;
+  data?: T;
+  message?: string;
+  errores?: ValidationFailure[];
+  errorCode: ErrorCode;
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Modelo de Producto
+
+```typescript
+{
+  id: number;
+  title: string;
+  price: number;
+  description: string;
+  category: string;
+  image: string;
+}
+```
+
+## ✅ Validaciones
+
+El formulario incluye validaciones en cliente:
+- Nombre: Requerido
+- Precio: Requerido, debe ser mayor a 0
+- Descripción: Requerido
+- Categoría: Requerido
+- Imagen URL: Requerido
+
+Los errores del backend (FluentValidation) se muestran automáticamente en los campos correspondientes.
+
+## 📝 Comandos Disponibles
+
+- `npm run dev` - Iniciar servidor de desarrollo
+- `npm run build` - Crear build de producción
+- `npm run start` - Iniciar servidor de producción
+- `npm run lint` - Ejecutar ESLint
+
+## 👤 Autor
+
+Desarrollado para gestionar productos del FakeStore API Gateway.
+
+---
+
+## 🐳 Docker
+
+### Configuración de Variables de Entorno
+
+Las variables de entorno están configuradas directamente en `docker-compose.yml`:
+
+- `API_URL`: URL interna para Server Components (http://backend-api:8080/api)
+- `NEXT_PUBLIC_API_URL`: URL externa para Client Components (http://localhost:5127/api)
+
+**Ventajas:**
+- ✅ No requiere archivos `.env` adicionales
+- ✅ Configuración portable en un solo archivo
+- ✅ Fácil distribución para otros entornos
+
+### Docker Compose (Recomendado - Backend + Frontend)
+
+```bash
+# Iniciar ambos servicios (Backend API + Frontend)
+docker compose up -d
+
+# Ver logs
+docker compose logs -f
+
+# Ver logs solo del frontend
+docker compose logs -f nextjs-app
+
+# Ver logs solo del backend
+docker compose logs -f backend-api
+
+# Detener servicios
+docker compose down
+```
+
+**Servicios disponibles:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5127
+
+### Configuración de red en Docker
+
+El `docker-compose.yml` configura:
+- Red compartida `app-network` entre frontend y backend
+- El frontend (Server Components) se comunica internamente con `http://backend-api:8080/api`
+- El navegador (Client Components) se comunica con `http://localhost:5127/api`
+
